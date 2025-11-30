@@ -79,7 +79,7 @@ export function SportJournalTopOffersModal({ sites }: TopOffersModalProps) {
 
         <div className="bg-magazine-white px-6 py-6 rounded-b-2xl">
           {/* Logo */}
-          <div className="flex items-center justify-center bg-magazine-cream rounded-xl p-5 mb-5 border border-magazine-border">
+          <div className="flex items-center justify-center bg-black rounded-xl p-5 mb-5 border border-magazine-border">
             <div className="relative h-16 w-full max-w-[180px]">
               <Image src={topSite.logo || "/placeholder.svg"} alt={topSite.name} fill className="object-contain" />
             </div>
