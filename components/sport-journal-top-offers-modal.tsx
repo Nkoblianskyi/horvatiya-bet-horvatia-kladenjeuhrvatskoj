@@ -1,0 +1,125 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { X } from "lucide-react"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
+import Image from "next/image"
+import type { BettingSite } from "@/types"
+
+interface TopOffersModalProps {
+  sites: BettingSite[]
+}
+
+function StarRating({ rating }: { rating: number }) {
+  const normalizedRating = (rating / 10) * 5
+  const fullStars = Math.floor(normalizedRating)
+  const partialStar = normalizedRating - fullStars
+
+  return (
+    <div className="flex items-center gap-0.5">
+      {[...Array(5)].map((_, index) => {
+        const fillPercentage = index < fullStars ? 100 : index === fullStars ? partialStar * 100 : 0
+
+        return (
+          <div key={index} className="relative w-5 h-5">
+            <svg className="w-5 h-5 text-magazine-silver" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+            </svg>
+            <div className="absolute inset-0 overflow-hidden" style={{ width: `${fillPercentage}%` }}>
+              <svg className="w-5 h-5 text-magazine-amber" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+              </svg>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+export function SportJournalTopOffersModal({ sites }: TopOffersModalProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [topSite, setTopSite] = useState<BettingSite | null>(null)
+
+  useEffect(() => {
+    if (sites.length > 0) {
+      setTopSite(sites[0])
+    }
+  }, [sites])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsOpen(true)
+    }, 8000)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  if (!topSite) return null
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent className="w-[90vw] max-w-[460px] p-0 bg-magazine-white border-2 border-magazine-teal shadow-2xl rounded-2xl">
+        <div className="relative bg-magazine-teal px-6 py-5 rounded-t-2xl">
+          <button
+            onClick={() => setIsOpen(false)}
+            className="absolute right-4 top-4 text-white/70 hover:text-white transition-colors z-10"
+            aria-label="Zatvori"
+          >
+            <X className="h-5 w-5" />
+          </button>
+
+          <div className="text-center">
+            <div className="inline-block px-3 py-1 bg-white/20 text-white text-xs font-bold uppercase tracking-wider rounded-full mb-2">
+              Preporuka
+            </div>
+            <h2 className="text-xl font-bold text-white">Najbolja Ponuda za Vas</h2>
+          </div>
+        </div>
+
+        <div className="bg-magazine-white px-6 py-6 rounded-b-2xl">
+          {/* Logo */}
+          <div className="flex items-center justify-center bg-magazine-cream rounded-xl p-5 mb-5 border border-magazine-border">
+            <div className="relative h-16 w-full max-w-[180px]">
+              <Image src={topSite.logo || "/placeholder.svg"} alt={topSite.name} fill className="object-contain" />
+            </div>
+          </div>
+
+          {/* Rating */}
+          <div className="flex items-center justify-center gap-3 mb-5">
+            <div className="text-3xl font-bold text-magazine-slate">{topSite.rating}</div>
+            <div className="flex flex-col items-start">
+              <StarRating rating={topSite.rating} />
+              <div className="text-xs text-magazine-gray mt-1">({topSite.reviews.toLocaleString()} recenzija)</div>
+            </div>
+          </div>
+
+          {/* Bonus */}
+          <div className="text-center mb-5">
+            <div className="text-sm text-magazine-gray mb-1">Bonus Dobrodošlice</div>
+            <div className="text-xl font-bold text-magazine-coral">{topSite.bonus}</div>
+            {topSite.dopBonus && (
+              <div className="text-base text-magazine-teal font-semibold mt-1">{topSite.dopBonus}</div>
+            )}
+          </div>
+
+          {/* CTA Button */}
+          <a
+            href={topSite.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full px-6 py-3.5 bg-magazine-teal hover:bg-magazine-teal/90 text-white text-base font-bold rounded-xl text-center transition-all shadow-sm hover:shadow-md mb-4"
+            onClick={() => setIsOpen(false)}
+          >
+            Preuzmi Bonus
+          </a>
+
+          {/* Terms */}
+          <div className="text-center pt-4 border-t border-magazine-border">
+            <p className="text-xs text-magazine-gray leading-relaxed">{topSite.terms}</p>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
